@@ -1,0 +1,63 @@
+### Gradle ###
+.gradle/
+.gradle-home/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Kotlin ###
+.kotlin/
+
+### Logs ###
+logs/
+*.log
+
+### Environment ###
+.env
+.env.*
+
+### H2 ###
+*.db
+*.mv.db
+*.trace.db
+
+### HTTP Client ###
+.idea/httpRequests/
+
+### Test reports / generated ###
+generated/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
