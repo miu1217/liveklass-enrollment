@@ -70,17 +70,5 @@ public class Course {
         this.reservedSeatCount = 0;
     }
 
-    @PrePersist
-    void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
-
-    @PreUpdate
-    void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
 
 }
