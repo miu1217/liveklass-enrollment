@@ -1,6 +1,7 @@
 package com.liveklass.course;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -86,4 +87,22 @@ public class Course {
     }
 
 
+    /**
+     * 강의 상태 전이 규칙을 검증한 뒤 상태를 변경한다.
+     * 허용되는 전이는 DRAFT -> OPEN, OPEN -> CLOSED 뿐이다.
+     */
+    public void changeStatus(CourseStatus nextStatus) {
+
+        if(this.status == CourseStatus.DRAFT && nextStatus == CourseStatus.OPEN){
+            this.status = nextStatus;
+            return;
+        }
+
+        if (this.status == CourseStatus.OPEN && nextStatus == CourseStatus.CLOSED) {
+            this.status = nextStatus;
+            return;
+        }
+
+        throw new IllegalArgumentException("변경할 수 없는 강의 상태입니다.");
+    }
 }

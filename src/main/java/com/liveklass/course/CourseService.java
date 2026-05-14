@@ -2,7 +2,9 @@ package com.liveklass.course;
 
 import com.liveklass.course.dto.CourseCreateRequest;
 import com.liveklass.course.dto.CourseResponse;
+import com.liveklass.course.dto.CourseStatusUpdateRequest;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -69,5 +71,16 @@ public class CourseService {
                 : courseRepository.findByStatus(status, pageable);
 
         return courses.map(CourseResponse::fromEntity);
+    }
+
+    @Transactional
+    public CourseResponse updateCourseStatus(Long courseId, @Valid CourseStatusUpdateRequest request) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+
+        course.changeStatus(request.getStatus());
+
+        return CourseResponse.fromEntity(course);
     }
 }

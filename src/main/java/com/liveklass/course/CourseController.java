@@ -2,19 +2,21 @@ package com.liveklass.course;
 
 import com.liveklass.course.dto.CourseCreateRequest;
 import com.liveklass.course.dto.CourseResponse;
+import com.liveklass.course.dto.CourseStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @Tag(name="Course", description = "강의 관리 관련 API ")
 @RestController
@@ -70,4 +72,20 @@ public class CourseController {
 
         return ResponseEntity.ok(responses);
     }
+
+    /**
+     * 강의 상태 변경 API
+     * */
+    @Operation(summary = "강의 상태 변경 API")
+    @PatchMapping(value = "/api/courses/{courseId}/status")
+    public ResponseEntity<CourseResponse> updateCourseStatus(
+            @PathVariable Long courseId,
+            @RequestBody @Valid CourseStatusUpdateRequest request
+            )
+    {
+        CourseResponse response = courseService.updateCourseStatus(courseId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
 }
