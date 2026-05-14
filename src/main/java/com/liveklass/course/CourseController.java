@@ -32,4 +32,16 @@ public class CourseController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+
+    /**
+     * 강의 상세 조회
+     * */
+    @Operation(summary = "강의 상세 조회 API")
+    @GetMapping(value = "/api/courses/{courseId}")
+    public ResponseEntity<CourseResponse> getCourseDetail(@PathVariable Long courseId){
+        CourseResponse response = courseService.getCourseDetail(courseId);
+
+        return ResponseEntity.ok(response);
+    }
 }

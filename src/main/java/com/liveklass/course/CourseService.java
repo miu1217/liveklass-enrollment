@@ -14,6 +14,9 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
+    /**
+     * 강의 등록
+     * */
     @Transactional
     public CourseResponse createCourse(String creatorId, String role, CourseCreateRequest request) {
 
@@ -42,5 +45,16 @@ public class CourseService {
         Course savedCourse = courseRepository.save(course);
 
         return CourseResponse.fromEntity(savedCourse);
+    }
+
+    /**
+     * 강의 상세 조회
+     * */
+    public CourseResponse getCourseDetail(Long courseId) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+
+        return CourseResponse.fromEntity(course);
     }
 }
