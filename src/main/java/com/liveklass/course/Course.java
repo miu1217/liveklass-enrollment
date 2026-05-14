@@ -1,10 +1,12 @@
 package com.liveklass.course;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Table(name = "courses")
 public class Course {
@@ -68,6 +70,19 @@ public class Course {
         this.endDate = endDate;
         this.status = CourseStatus.DRAFT;
         this.reservedSeatCount = 0;
+    }
+
+
+    @PrePersist
+    void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
 
