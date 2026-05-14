@@ -18,6 +18,7 @@ logs/
 .env.*
 
 ### H2 ###
+data/
 *.db
 *.mv.db
 *.trace.db
