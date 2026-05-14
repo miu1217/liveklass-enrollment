@@ -5,6 +5,8 @@ import com.liveklass.course.dto.CourseResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -56,5 +58,16 @@ public class CourseService {
                 .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
 
         return CourseResponse.fromEntity(course);
+    }
+
+    @Transactional
+    public Page<CourseResponse> getCourses(CourseStatus status, Pageable pageable) {
+
+        // 상태 필터가 없으면 전체 조회하고, 있으면 해당 상태의 강의만 조회한다.
+        Page<Course> courses = status == null
+                ? courseRepository.findAll(pageable)
+                : courseRepository.findByStatus(status, pageable);
+
+        return courses.map(CourseResponse::fromEntity);
     }
 }

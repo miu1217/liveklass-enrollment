@@ -3,12 +3,18 @@ package com.liveklass.course;
 import com.liveklass.course.dto.CourseCreateRequest;
 import com.liveklass.course.dto.CourseResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name="Course", description = "강의 관리 관련 API ")
 @RestController
@@ -43,5 +49,25 @@ public class CourseController {
         CourseResponse response = courseService.getCourseDetail(courseId);
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 강의 목록 조회
+     * */
+    @Operation(summary = "강의 목록 조회 API")
+    @GetMapping(value = "/api/courses")
+    public ResponseEntity<Page<CourseResponse>> getCourses(
+            @RequestHeader(required = false) CourseStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+            ){
+
+        Pageable pageable = PageRequest.of(
+                page, size, Sort.by(Sort.Direction.DESC,"id")
+        );
+
+        Page<CourseResponse> responses = courseService.getCourses(status, pageable);
+
+        return ResponseEntity.ok(responses);
     }
 }
