@@ -105,4 +105,19 @@ public class Course {
 
         throw new IllegalArgumentException("변경할 수 없는 강의 상태입니다.");
     }
+
+    /**
+     * 모집 중인 강의에 정원이 남아 있을 때만 좌석을 선점한다.
+     */
+    public void reserveSeat() {
+        if (this.status != CourseStatus.OPEN) {
+            throw new IllegalArgumentException("모집 중인 강의만 수강 신청할 수 있습니다.");
+        }
+
+        if (this.reservedSeatCount >= this.capacity) {
+            throw new IllegalArgumentException("수강 정원이 초과되었습니다.");
+        }
+
+        this.reservedSeatCount++;
+    }
 }
