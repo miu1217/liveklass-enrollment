@@ -63,7 +63,9 @@ public class EnrollmentService {
             throw new IllegalArgumentException("본인의 수강 신청만 결제 확정할 수 있습니다.");
         }
 
-        Course course = enrollment.getCourse();
+        Course course = courseRepository.findByIdForUpdate(enrollment.getCourse().getId())
+                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+
 
         course.reserveSeat();
         enrollment.confirm();
