@@ -105,4 +105,26 @@ public class EnrollmentService {
 
         return enrollments.map(EnrollmentResponse::fromEntity);
     }
+
+    /**
+     * 강의별 수강생 목록 조회
+     * */
+    @Transactional
+    public Page<EnrollmentResponse> getCourseEnrollments(Long courseId, String userId, String role, Pageable pageable) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+
+        if (!"CREATOR".equals(role) || !course.getCreatorId().equals(userId)) {
+            throw new IllegalArgumentException("강의 수강생 목록은 해당 강의의 크리에이터만 조회할 수 있습니다.");
+        }
+        Page<Enrollment> enrollments = enrollmentRepository.findByCourseIdAndStatus(
+                courseId,
+                EnrollmentStatus.CONFIRMED,
+                pageable
+        );
+
+        return enrollments.map(EnrollmentResponse::fromEntity);
+
+    }
 }

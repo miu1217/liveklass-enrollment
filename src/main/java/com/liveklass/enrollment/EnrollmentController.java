@@ -82,4 +82,30 @@ public class EnrollmentController {
 
         return  ResponseEntity.ok(responses);
     }
+
+
+    /**
+     * 강의별 수강생 목록 조회
+     * */
+    @Operation(summary = "강의별 수강생 목록 조회", description = "수강생이라서 결제 완료된 학생들의 목록만 조회")
+    @GetMapping("/api/courses/{courseId}/enrollments")
+    public ResponseEntity<Page<EnrollmentResponse>> getCourseEnrollments(
+            @PathVariable Long courseId,
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader("X-USER-ROLE") String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<EnrollmentResponse> response = enrollmentService.getCourseEnrollments(
+                courseId,
+                userId,
+                role,
+                pageable
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }
