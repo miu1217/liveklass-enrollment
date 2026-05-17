@@ -18,6 +18,9 @@ public class EnrollmentService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
 
+    /**
+     * 수강 신청 API
+     * */
     @Transactional
     public EnrollmentResponse applyEnrollment(Long courseId, String studentId) {
 
@@ -44,6 +47,9 @@ public class EnrollmentService {
 
     }
 
+    /**
+     * 수강 확정 API
+     * */
     @Transactional
     public EnrollmentResponse confirmEnrollment(Long enrollmentId, String studentId) {
 
@@ -62,6 +68,9 @@ public class EnrollmentService {
         return EnrollmentResponse.fromEntity(enrollment);
     }
 
+    /**
+     * 수강 취소 API
+     * */
     @Transactional
     public EnrollmentResponse cancelEnrollment(Long enrollmentId, String studentId) {
 

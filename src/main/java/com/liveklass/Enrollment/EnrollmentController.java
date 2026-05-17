@@ -16,6 +16,9 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
+    /**
+     * 수강 신청 API
+     * */
     @Operation(summary = "수강 신청 API")
     @PostMapping("/api/courses/{courseId}/enrollments")
     public ResponseEntity<EnrollmentResponse> applyEnrollment(@PathVariable Long courseId,
@@ -27,6 +30,9 @@ public class EnrollmentController {
 
     }
 
+    /**
+     * 수강 확정 API
+     * */
     @Operation(summary = "수강 결제 확정 API")
     @PatchMapping("/api/enrollments/{enrollmentId}/confirm")
     public ResponseEntity<EnrollmentResponse> confirmEnrollment(@PathVariable Long enrollmentId,
@@ -40,6 +46,9 @@ public class EnrollmentController {
     }
 
 
+    /**
+     * 수강 취소 API
+     * */
     @Operation(summary = "수강 취소 API")
     @PatchMapping("/api/enrollments/{enrollmentId}/cancel")
     public ResponseEntity<EnrollmentResponse> cancelEnrollment(@PathVariable Long enrollmentId,
