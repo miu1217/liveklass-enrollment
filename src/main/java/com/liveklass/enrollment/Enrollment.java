@@ -1,4 +1,4 @@
-package com.liveklass.Enrollment;
+package com.liveklass.enrollment;
 
 import com.liveklass.course.Course;
 import jakarta.persistence.*;

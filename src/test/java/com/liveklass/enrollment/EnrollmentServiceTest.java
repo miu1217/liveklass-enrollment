@@ -1,9 +1,6 @@
 package com.liveklass.enrollment;
 
-import com.liveklass.Enrollment.EnrollmentRepository;
-import com.liveklass.Enrollment.EnrollmentService;
-import com.liveklass.Enrollment.EnrollmentStatus;
-import com.liveklass.Enrollment.dto.EnrollmentResponse;
+import com.liveklass.enrollment.dto.EnrollmentResponse;
 import com.liveklass.course.Course;
 import com.liveklass.course.CourseRepository;
 import com.liveklass.course.CourseStatus;

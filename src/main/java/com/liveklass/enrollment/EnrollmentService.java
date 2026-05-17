@@ -1,11 +1,14 @@
-package com.liveklass.Enrollment;
+package com.liveklass.enrollment;
 
-import com.liveklass.Enrollment.dto.EnrollmentResponse;
 import com.liveklass.course.Course;
 import com.liveklass.course.CourseRepository;
+import com.liveklass.enrollment.dto.EnrollmentResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 
@@ -90,5 +93,16 @@ public class EnrollmentService {
         }
 
         return EnrollmentResponse.fromEntity(enrollment);
+    }
+
+    /**
+     * 내 수강 신청 목록 조회
+     * */
+    @Transactional
+    public Page<EnrollmentResponse> getMyEnrollments(String studentId, Pageable pageable) {
+
+        Page<Enrollment> enrollments = enrollmentRepository.findByStudentId(studentId, pageable);
+
+        return enrollments.map(EnrollmentResponse::fromEntity);
     }
 }

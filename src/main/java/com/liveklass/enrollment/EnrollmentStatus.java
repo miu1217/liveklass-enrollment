@@ -1,4 +1,4 @@
-package com.liveklass.Enrollment;
+package com.liveklass.enrollment;
 
 public enum EnrollmentStatus {
 

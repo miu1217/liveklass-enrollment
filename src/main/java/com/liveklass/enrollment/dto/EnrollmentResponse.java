@@ -1,7 +1,7 @@
-package com.liveklass.Enrollment.dto;
+package com.liveklass.enrollment.dto;
 
-import com.liveklass.Enrollment.Enrollment;
-import com.liveklass.Enrollment.EnrollmentStatus;
+import com.liveklass.enrollment.Enrollment;
+import com.liveklass.enrollment.EnrollmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
