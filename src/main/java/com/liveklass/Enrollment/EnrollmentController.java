@@ -38,4 +38,16 @@ public class EnrollmentController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @Operation(summary = "수강 취소 API")
+    @PatchMapping("/api/enrollments/{enrollmentId}/cancel")
+    public ResponseEntity<EnrollmentResponse> cancelEnrollment(@PathVariable Long enrollmentId,
+                                                               @RequestHeader("X-USER-ID") String studentId){
+
+        EnrollmentResponse response = enrollmentService.cancelEnrollment(enrollmentId, studentId);
+
+        return ResponseEntity.ok(response);
+
+    }
 }

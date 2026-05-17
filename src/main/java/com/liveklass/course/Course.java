@@ -120,4 +120,15 @@ public class Course {
 
         this.reservedSeatCount++;
     }
+
+    /**
+     * 결제 확정된 수강 신청이 취소되면 확정 수강 인원을 감소시킨다.
+     */
+    public void releaseSeat() {
+        if (this.reservedSeatCount <= 0) {
+            throw new IllegalArgumentException("반환할 좌석이 없습니다.");
+        }
+
+        this.reservedSeatCount--;
+    }
 }

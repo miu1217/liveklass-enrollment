@@ -18,6 +18,7 @@ public class EnrollmentService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
 
+    @Transactional
     public EnrollmentResponse applyEnrollment(Long courseId, String studentId) {
 
 
@@ -43,6 +44,7 @@ public class EnrollmentService {
 
     }
 
+    @Transactional
     public EnrollmentResponse confirmEnrollment(Long enrollmentId, String studentId) {
 
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
@@ -56,6 +58,27 @@ public class EnrollmentService {
 
         course.reserveSeat();
         enrollment.confirm();
+
+        return EnrollmentResponse.fromEntity(enrollment);
+    }
+
+    @Transactional
+    public EnrollmentResponse cancelEnrollment(Long enrollmentId, String studentId) {
+
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new IllegalArgumentException("수강 신청을 찾을 수 없습니다."));
+
+        if (!enrollment.isOwnedBy(studentId)) {
+            throw new IllegalArgumentException("본인의 수강 신청만 취소할 수 있습니다.");
+        }
+
+        boolean confirmed = enrollment.isConfirmed();
+
+        enrollment.cancel();
+
+        if (confirmed) {
+            enrollment.getCourse().releaseSeat();
+        }
 
         return EnrollmentResponse.fromEntity(enrollment);
     }

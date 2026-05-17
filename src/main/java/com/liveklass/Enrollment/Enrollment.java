@@ -84,4 +84,20 @@ public class Enrollment {
     public boolean isOwnedBy(String studentId) {
         return this.studentId.equals(studentId);
     }
+
+    /**
+     * 취소되지 않은 수강 신청만 취소 상태로 변경할 수 있다.
+     */
+    public void cancel() {
+        if (this.status == EnrollmentStatus.CANCELLED) {
+            throw new IllegalArgumentException("이미 취소된 수강 신청입니다.");
+        }
+
+        this.status = EnrollmentStatus.CANCELLED;
+        this.cancelledAt = LocalDateTime.now();
+    }
+
+    public boolean isConfirmed() {
+        return this.status == EnrollmentStatus.CONFIRMED;
+    }
 }
