@@ -8,6 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -176,5 +179,70 @@ class EnrollmentServiceTest {
         course.changeStatus(CourseStatus.OPEN);
 
         return courseRepository.save(course);
+    }
+
+
+    @Test
+    @DisplayName("내 수강 신청 목록을 페이지 단위로 조회할 수 있다")
+    void getMyEnrollments() {
+        Course course1 = createOpenCourse(10);
+        Course course2 = createOpenCourse(10);
+        Course course3 = createOpenCourse(10);
+
+        enrollmentService.applyEnrollment(course1.getId(), "student-1");
+        enrollmentService.applyEnrollment(course2.getId(), "student-1");
+        enrollmentService.applyEnrollment(course3.getId(), "student-2");
+
+        Page<EnrollmentResponse> response = enrollmentService.getMyEnrollments(
+                "student-1",
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
+        );
+
+        assertThat(response.getContent()).hasSize(2);
+        assertThat(response.getTotalElements()).isEqualTo(2);
+        assertThat(response.getContent())
+                .extracting(EnrollmentResponse::getStudentId)
+                .containsOnly("student-1");
+    }
+
+    @Test
+    @DisplayName("강의별 수강생 목록은 CONFIRMED 상태의 신청만 조회한다")
+    void getCourseEnrollments() {
+        Course course = createOpenCourse(10);
+
+        EnrollmentResponse pending = enrollmentService.applyEnrollment(course.getId(), "student-1");
+        EnrollmentResponse confirmed = enrollmentService.applyEnrollment(course.getId(), "student-2");
+        EnrollmentResponse cancelled = enrollmentService.applyEnrollment(course.getId(), "student-3");
+
+        enrollmentService.confirmEnrollment(confirmed.getId(), "student-2");
+        enrollmentService.cancelEnrollment(cancelled.getId(), "student-3");
+
+        Page<EnrollmentResponse> response = enrollmentService.getCourseEnrollments(
+                course.getId(),
+                "creator-1",
+                "CREATOR",
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
+        );
+
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).getStudentId()).isEqualTo("student-2");
+        assertThat(response.getContent().get(0).getStatus()).isEqualTo(EnrollmentStatus.CONFIRMED);
+    }
+
+    @Test
+    @DisplayName("강의별 수강생 목록은 해당 강의의 크리에이터만 조회할 수 있다")
+    void cannotGetCourseEnrollmentsByOtherCreator() {
+        Course course = createOpenCourse(10);
+
+        enrollmentService.applyEnrollment(course.getId(), "student-1");
+
+        assertThatThrownBy(() -> enrollmentService.getCourseEnrollments(
+                course.getId(),
+                "creator-2",
+                "CREATOR",
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("강의 수강생 목록은 해당 강의의 크리에이터만 조회할 수 있습니다.");
     }
 }
