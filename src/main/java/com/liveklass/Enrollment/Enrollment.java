@@ -69,5 +69,19 @@ public class Enrollment {
     }
 
 
+    /**
+     * 결제 대기 상태의 수강 신청만 결제 확정 상태로 변경할 수 있다.
+     */
+    public void confirm() {
+        if (this.status != EnrollmentStatus.PENDING) {
+            throw new IllegalArgumentException("결제 대기 상태의 수강 신청만 확정할 수 있습니다.");
+        }
 
+        this.status = EnrollmentStatus.CONFIRMED;
+        this.confirmedAt = LocalDateTime.now();
+    }
+
+    public boolean isOwnedBy(String studentId) {
+        return this.studentId.equals(studentId);
+    }
 }
