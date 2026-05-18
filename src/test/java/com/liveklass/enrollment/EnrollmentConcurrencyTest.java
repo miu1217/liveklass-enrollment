@@ -62,22 +62,14 @@ class EnrollmentConcurrencyTest {
                     readyLatch.countDown();
                     startLatch.await();
 
-                    System.out.println(Thread.currentThread().getName()
-                            + " 결제 확정 시도: " + enrollment.getStudentId());
 
                     enrollmentService.confirmEnrollment(
                             enrollment.getId(),
                             enrollment.getStudentId()
                     );
 
-                    System.out.println(Thread.currentThread().getName()
-                            + " 결제 확정 성공: " + enrollment.getStudentId());
-
                     successCount.incrementAndGet();
                 } catch (Exception exception) {
-                    System.out.println(Thread.currentThread().getName()
-                            + " 결제 확정 실패: " + enrollment.getStudentId()
-                            + " / reason=" + exception.getMessage());
 
                     failCount.incrementAndGet();
                 } finally {
@@ -98,10 +90,6 @@ class EnrollmentConcurrencyTest {
                 .filter(enrollment -> enrollment.getStatus() == EnrollmentStatus.CONFIRMED)
                 .count();
 
-        System.out.println("successCount = " + successCount.get());
-        System.out.println("failCount = " + failCount.get());
-        System.out.println("reservedSeatCount = " + foundCourse.getReservedSeatCount());
-        System.out.println("confirmedCount = " + confirmedCount);
 
         assertThat(successCount.get()).isEqualTo(1);
         assertThat(failCount.get()).isEqualTo(1);

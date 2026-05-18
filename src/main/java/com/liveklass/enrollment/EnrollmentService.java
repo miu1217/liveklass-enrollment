@@ -8,7 +8,6 @@ import com.liveklass.course.CourseRepository;
 import com.liveklass.enrollment.dto.EnrollmentResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
