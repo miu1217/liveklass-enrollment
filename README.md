@@ -17,7 +17,7 @@
 - H2 Database
 - Gradle
 - JUnit 5
-- Springdoc OpenAPI Swagger
+- springdoc-openapi Swagger UI
 - Lombok
 
 ## 실행 방법
@@ -84,7 +84,7 @@ SELECT * FROM courses WHERE status = 'OPEN';
   - 강의 생성: `X-CREATOR-ID`, `X-USER-ROLE` 헤더 사용
   - 수강생 기능: `X-USER-ID` 헤더 사용
 - 강의 상태는 `DRAFT -> OPEN -> CLOSED` 순서로만 변경할 수 있습니다.
-- 수강 신청 상태는 `PENDING -> CONFIRMED -> CANCELLED` 흐름으로 처리합니다.
+- 수강 신청은 `PENDING`, `CONFIRMED`, `CANCELLED` 상태를 가지며, 취소 이력은 삭제하지 않습니다.
 - `PENDING`은 결제 대기 상태이므로 정원에 포함하지 않습니다.
 - 정원은 결제 확정 시점에 반영하며, `CONFIRMED` 상태가 될 때 확정 수강 인원을 증가시킵니다.
 - 취소된 신청은 이력 보존을 위해 삭제하지 않고 `CANCELLED` 상태로 남깁니다.
@@ -328,17 +328,48 @@ SELECT * FROM enrollments;
 ./gradlew test
 ```
 
+특정 테스트 클래스만 실행:
+
+```bash
+./gradlew test --tests "com.liveklass.course.CourseServiceTest"
+./gradlew test --tests "com.liveklass.enrollment.EnrollmentServiceTest"
+./gradlew test --tests "com.liveklass.enrollment.EnrollmentConcurrencyTest"
+```
+
+테스트는 H2 인메모리 DB를 사용하며, 테스트 실행 시 필요한 데이터를 테스트 코드에서 직접 생성합니다.
+
 주요 테스트 시나리오:
 
-- 강의 생성/조회/상태 변경
-- 잘못된 강의 상태 전이 실패
-- 수강 신청 시 `PENDING` 생성
-- 결제 확정 시 `CONFIRMED` 변경 및 정원 증가
-- 수강 취소 시 `CANCELLED` 변경 및 정원 감소
-- 중복 신청 방지와 취소 후 재신청 허용
-- 내 수강 신청 목록 조회
-- 강의별 수강생 목록 조회
-- 마지막 자리 동시 결제 확정 시 한 명만 성공하는 동시성 테스트
+### CourseServiceTest
+
+- 강의 등록 시 기본 상태가 `DRAFT`인지 검증
+- 강의 상세 조회 검증
+- 강의 목록 페이지네이션 조회 검증
+- 강의 상태 필터 조회 검증
+- `DRAFT -> OPEN`, `OPEN -> CLOSED` 상태 전이 검증
+- `DRAFT -> CLOSED` 직접 전이 실패 검증
+- 크리에이터 역할이 아닌 사용자의 강의 생성 실패 검증
+
+### EnrollmentServiceTest
+
+- 수강 신청 시 `PENDING` 상태로 저장되는지 검증
+- 신청 시점에는 정원이 증가하지 않는지 검증
+- 결제 확정 시 `CONFIRMED` 상태 변경 및 정원 증가 검증
+- 수강 취소 시 `CANCELLED` 상태 변경 검증
+- 확정된 신청 취소 시 정원 감소 검증
+- 중복 신청 방지 검증
+- 취소 후 재신청 가능 정책 검증
+- 정원 초과 시 결제 확정 실패 검증
+- 본인 신청만 결제 확정/취소 가능한지 검증
+- 내 수강 신청 목록 페이지네이션 조회 검증
+- 강의별 수강생 목록이 `CONFIRMED` 상태만 반환하는지 검증
+- 강의 크리에이터만 수강생 목록을 조회할 수 있는지 검증
+
+### EnrollmentConcurrencyTest
+
+- 정원이 1명 남은 강의에 대해 두 사용자가 동시에 결제 확정을 시도하는 상황 검증
+- `PESSIMISTIC_WRITE` 락을 통해 한 명만 확정되고, 다른 한 명은 정원 초과로 실패하는지 검증
+- 최종 확정 수강 인원과 실제 `CONFIRMED` 신청 수가 정원을 초과하지 않는지 검증
 
 ## 미구현 / 제약사항
 
