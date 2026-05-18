@@ -48,6 +48,35 @@ User Name: sa
 Password:
 ```
 
+## 샘플 데이터 삽입 SQL
+
+애플리케이션 실행 후 H2 Console에서 아래 SQL을 실행하면 강의 목록 조회와 상태 필터 조회를 바로 확인할 수 있습니다.
+H2 인메모리 DB를 사용하므로 애플리케이션을 재시작하면 데이터는 초기화됩니다.
+
+```sql
+INSERT INTO courses (
+    creator_id, title, description, price, capacity, reserved_seat_count,
+    status, start_date, end_date, created_at, updated_at
+) VALUES
+('creator-1', 'Spring Boot 입문', 'Spring Boot와 REST API 기본 구조를 학습하는 강의입니다.', 50000, 30, 0, 'DRAFT', '2026-06-01', '2026-06-30', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-1', 'JPA 실전 매핑', '엔티티 설계, 연관관계 매핑, 트랜잭션 기초를 다룹니다.', 80000, 25, 0, 'DRAFT', '2026-06-10', '2026-07-10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-2', 'Kotlin 백엔드 기초', 'Kotlin 문법과 Spring Boot 기반 백엔드 개발 흐름을 익힙니다.', 70000, 20, 0, 'OPEN', '2026-07-01', '2026-07-31', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-2', 'MSA 설계 입문', '서비스 분리 기준, API 계약, 장애 격리 설계를 학습합니다.', 120000, 15, 0, 'OPEN', '2026-08-01', '2026-08-31', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-3', '프로덕트 엔지니어링 워크숍', '제품 요구사항을 API와 데이터 모델로 풀어내는 실습형 강의입니다.', 90000, 12, 0, 'DRAFT', '2026-06-15', '2026-07-15', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-3', '테스트 코드와 리팩토링', 'JUnit 5와 Spring Boot 테스트 전략을 실습합니다.', 60000, 40, 0, 'OPEN', '2026-09-01', '2026-09-30', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-1', 'REST API 설계 기초', '리소스 중심 URL, 상태 코드, 요청/응답 DTO 설계를 학습합니다.', 55000, 35, 0, 'CLOSED', '2026-10-01', '2026-10-31', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-2', 'Spring Security 입문', '인증과 인가의 기본 개념, 필터 체인, 보안 설정 흐름을 다룹니다.', 85000, 20, 0, 'DRAFT', '2026-10-15', '2026-11-15', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-3', '데이터베이스 트랜잭션', '격리 수준, 락, 정합성 문제를 실무 예제로 학습합니다.', 95000, 18, 0, 'OPEN', '2026-11-01', '2026-11-30', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('creator-1', '클린 아키텍처 실습', '계층 분리, 의존성 방향, 테스트 가능한 구조를 예제로 익힙니다.', 110000, 16, 0, 'CLOSED', '2026-11-10', '2026-12-10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+```
+
+확인 쿼리:
+
+```sql
+SELECT * FROM courses ORDER BY id DESC;
+SELECT * FROM courses WHERE status = 'OPEN';
+```
+
 ## 요구사항 해석 및 가정
 
 - 과제 문서의 Class(강의)는 Java 표준 타입 `Class`와의 혼동을 피하기 위해 코드에서는 `Course`로 명명했습니다.
@@ -163,6 +192,108 @@ X-USER-ROLE: CREATOR
 ```
 
 `CONFIRMED` 상태의 수강 신청만 수강생 목록에 포함합니다.
+
+## 수동 검증 방법
+
+애플리케이션 실행 후 Swagger UI에서 아래 순서로 호출하면 주요 흐름을 확인할 수 있습니다.
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+### 1. 강의 생성
+
+```http
+POST /api/courses
+X-CREATOR-ID: creator-1
+X-USER-ROLE: CREATOR
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "Spring Boot 입문",
+  "description": "Spring Boot와 JPA 기초를 다루는 강의입니다.",
+  "price": 50000,
+  "capacity": 2,
+  "startDate": "2026-06-01",
+  "endDate": "2026-06-30"
+}
+```
+
+### 2. 강의 모집 시작
+
+```http
+PATCH /api/courses/{courseId}/status
+Content-Type: application/json
+```
+
+```json
+{
+  "status": "OPEN"
+}
+```
+
+### 3. 수강 신청
+
+```http
+POST /api/courses/{courseId}/enrollments
+X-USER-ID: student-1
+```
+
+응답 상태가 `PENDING`인지 확인합니다.
+
+### 4. 결제 확정
+
+```http
+PATCH /api/enrollments/{enrollmentId}/confirm
+X-USER-ID: student-1
+```
+
+응답 상태가 `CONFIRMED`인지 확인합니다.
+이후 강의 상세 조회에서 `currentEnrollmentCount`가 증가했는지 확인합니다.
+
+```http
+GET /api/courses/{courseId}
+```
+
+### 5. 수강 취소
+
+```http
+PATCH /api/enrollments/{enrollmentId}/cancel
+X-USER-ID: student-1
+```
+
+응답 상태가 `CANCELLED`인지 확인합니다.
+확정된 신청을 취소한 경우 강의 상세 조회에서 `currentEnrollmentCount`가 감소했는지 확인합니다.
+
+### 6. 내 수강 신청 목록 조회
+
+```http
+GET /api/enrollments/me?page=0&size=10
+X-USER-ID: student-1
+```
+
+### 7. 강의별 수강생 목록 조회
+
+```http
+GET /api/courses/{courseId}/enrollments?page=0&size=10
+X-USER-ID: creator-1
+X-USER-ROLE: CREATOR
+```
+
+결제 확정된 `CONFIRMED` 신청만 조회됩니다.
+
+### H2 데이터 확인
+
+H2 Console에서 아래 쿼리로 저장 상태를 확인할 수 있습니다.
+
+```sql
+SELECT * FROM courses;
+SELECT * FROM enrollments;
+```
 
 ## 데이터 모델 설명
 
