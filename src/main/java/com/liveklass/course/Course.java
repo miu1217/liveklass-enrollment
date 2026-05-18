@@ -1,5 +1,6 @@
 package com.liveklass.course;
 
+import com.liveklass.common.exception.BusinessException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -103,7 +104,7 @@ public class Course {
             return;
         }
 
-        throw new IllegalArgumentException("변경할 수 없는 강의 상태입니다.");
+        throw new BusinessException("변경할 수 없는 강의 상태입니다.");
     }
 
     /**
@@ -111,11 +112,11 @@ public class Course {
      */
     public void reserveSeat() {
         if (this.status != CourseStatus.OPEN) {
-            throw new IllegalArgumentException("모집 중인 강의만 수강 신청할 수 있습니다.");
+            throw new BusinessException("모집 중인 강의만 수강 신청할 수 있습니다.");
         }
 
         if (this.reservedSeatCount >= this.capacity) {
-            throw new IllegalArgumentException("수강 정원이 초과되었습니다.");
+            throw new BusinessException("수강 정원이 초과되었습니다.");
         }
 
         this.reservedSeatCount++;
@@ -126,7 +127,7 @@ public class Course {
      */
     public void releaseSeat() {
         if (this.reservedSeatCount <= 0) {
-            throw new IllegalArgumentException("반환할 좌석이 없습니다.");
+            throw new BusinessException("반환할 좌석이 없습니다.");
         }
 
         this.reservedSeatCount--;

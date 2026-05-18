@@ -1,5 +1,7 @@
 package com.liveklass.course;
 
+import com.liveklass.common.exception.BusinessException;
+import com.liveklass.common.exception.ForbiddenException;
 import com.liveklass.course.dto.CourseCreateRequest;
 import com.liveklass.course.dto.CourseResponse;
 import com.liveklass.course.dto.CourseStatusUpdateRequest;
@@ -155,7 +157,7 @@ class CourseServiceTest {
                 created.getId(),
                 new CourseStatusUpdateRequest(CourseStatus.CLOSED)
         ))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessage("변경할 수 없는 강의 상태입니다.");
     }
 
@@ -167,7 +169,7 @@ class CourseServiceTest {
                 "STUDENT",
                 createRequest("Spring Boot 입문")
         ))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("크리에이터만 강의를 생성할 수 있습니다.");
     }
 

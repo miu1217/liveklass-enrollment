@@ -1,5 +1,6 @@
 package com.liveklass.enrollment;
 
+import com.liveklass.common.exception.BusinessException;
 import com.liveklass.course.Course;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -74,7 +75,7 @@ public class Enrollment {
      */
     public void confirm() {
         if (this.status != EnrollmentStatus.PENDING) {
-            throw new IllegalArgumentException("결제 대기 상태의 수강 신청만 확정할 수 있습니다.");
+            throw new BusinessException("결제 대기 상태의 수강 신청만 확정할 수 있습니다.");
         }
 
         this.status = EnrollmentStatus.CONFIRMED;
@@ -90,7 +91,7 @@ public class Enrollment {
      */
     public void cancel() {
         if (this.status == EnrollmentStatus.CANCELLED) {
-            throw new IllegalArgumentException("이미 취소된 수강 신청입니다.");
+            throw new BusinessException("이미 취소된 수강 신청입니다.");
         }
 
         this.status = EnrollmentStatus.CANCELLED;

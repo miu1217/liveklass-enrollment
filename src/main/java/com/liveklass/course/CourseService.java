@@ -1,5 +1,8 @@
 package com.liveklass.course;
 
+import com.liveklass.common.exception.BusinessException;
+import com.liveklass.common.exception.ForbiddenException;
+import com.liveklass.common.exception.NotFoundException;
 import com.liveklass.course.dto.CourseCreateRequest;
 import com.liveklass.course.dto.CourseResponse;
 import com.liveklass.course.dto.CourseStatusUpdateRequest;
@@ -26,13 +29,13 @@ public class CourseService {
 
         //
         if(!"CREATOR".equals(role)){
-            throw new IllegalArgumentException("크리에이터만 강의를 생성할 수 있습니다.");
+            throw new ForbiddenException("크리에이터만 강의를 생성할 수 있습니다.");
 
         }
 
         if(request.getEndDate().isBefore(request.getStartDate()))
         {
-            throw new IllegalArgumentException("수강 종료일은 시작일보다 빠를 수 없습니다.");
+            throw new BusinessException("수강 종료일은 시작일보다 빠를 수 없습니다.");
 
         }
 
@@ -57,7 +60,7 @@ public class CourseService {
     public CourseResponse getCourseDetail(Long courseId) {
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("강의를 찾을 수 없습니다."));
 
         return CourseResponse.fromEntity(course);
     }
@@ -77,7 +80,7 @@ public class CourseService {
     public CourseResponse updateCourseStatus(Long courseId, @Valid CourseStatusUpdateRequest request) {
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("강의를 찾을 수 없습니다."));
 
         course.changeStatus(request.getStatus());
 

@@ -1,5 +1,7 @@
 package com.liveklass.enrollment;
 
+import com.liveklass.common.exception.BusinessException;
+import com.liveklass.common.exception.ForbiddenException;
 import com.liveklass.enrollment.dto.EnrollmentResponse;
 import com.liveklass.course.Course;
 import com.liveklass.course.CourseRepository;
@@ -111,7 +113,7 @@ class EnrollmentServiceTest {
         enrollmentService.applyEnrollment(course.getId(), "student-1");
 
         assertThatThrownBy(() -> enrollmentService.applyEnrollment(course.getId(), "student-1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessage("이미 신청 중인 강의입니다.");
     }
 
@@ -139,7 +141,7 @@ class EnrollmentServiceTest {
         enrollmentService.confirmEnrollment(first.getId(), "student-1");
 
         assertThatThrownBy(() -> enrollmentService.confirmEnrollment(second.getId(), "student-2"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessage("수강 정원이 초과되었습니다.");
     }
 
@@ -150,7 +152,7 @@ class EnrollmentServiceTest {
         EnrollmentResponse applied = enrollmentService.applyEnrollment(course.getId(), "student-1");
 
         assertThatThrownBy(() -> enrollmentService.confirmEnrollment(applied.getId(), "student-2"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("본인의 수강 신청만 결제 확정할 수 있습니다.");
     }
 
@@ -161,7 +163,7 @@ class EnrollmentServiceTest {
         EnrollmentResponse applied = enrollmentService.applyEnrollment(course.getId(), "student-1");
 
         assertThatThrownBy(() -> enrollmentService.cancelEnrollment(applied.getId(), "student-2"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("본인의 수강 신청만 취소할 수 있습니다.");
     }
 
@@ -242,7 +244,7 @@ class EnrollmentServiceTest {
                 "CREATOR",
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
         ))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("강의 수강생 목록은 해당 강의의 크리에이터만 조회할 수 있습니다.");
     }
 }

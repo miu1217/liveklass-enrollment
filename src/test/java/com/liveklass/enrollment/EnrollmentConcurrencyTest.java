@@ -4,6 +4,7 @@ import com.liveklass.course.Course;
 import com.liveklass.course.CourseRepository;
 import com.liveklass.course.CourseStatus;
 import com.liveklass.enrollment.dto.EnrollmentResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ class EnrollmentConcurrencyTest {
 
     @Autowired
     private EnrollmentRepository enrollmentRepository;
+
+    @AfterEach
+    void tearDown() {
+        enrollmentRepository.deleteAll();
+        courseRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("동시에 마지막 자리에 결제 확정을 시도해도 정원을 초과하지 않는다")
