@@ -107,6 +107,18 @@ class EnrollmentServiceTest {
     }
 
     @Test
+    @DisplayName("결제 확정 후 7일이 지나면 수강 신청을 취소할 수 없다")
+    void cannotCancelAfterCancellationPeriod() {
+        Course course = createOpenCourse(10);
+        Enrollment enrollment = new Enrollment(course, "student-1");
+        enrollment.confirm();
+
+        assertThatThrownBy(() -> enrollment.cancel(enrollment.getConfirmedAt().plusDays(8)))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("결제 확정 후 7일이 지나 취소할 수 없습니다.");
+    }
+
+    @Test
     @DisplayName("PENDING 또는 CONFIRMED 신청이 있으면 같은 강의에 중복 신청할 수 없다")
     void cannotApplyDuplicateEnrollment() {
         Course course = createOpenCourse(10);

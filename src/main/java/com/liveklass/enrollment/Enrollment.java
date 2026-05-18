@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "enrollments")
 public class Enrollment {
 
+    private static final int CANCELLATION_AVAILABLE_DAYS = 7;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -90,12 +92,21 @@ public class Enrollment {
      * 취소되지 않은 수강 신청만 취소 상태로 변경할 수 있다.
      */
     public void cancel() {
+        cancel(LocalDateTime.now());
+    }
+
+    public void cancel(LocalDateTime now) {
         if (this.status == EnrollmentStatus.CANCELLED) {
             throw new BusinessException("이미 취소된 수강 신청입니다.");
         }
 
+        if (this.status == EnrollmentStatus.CONFIRMED
+                && this.confirmedAt.plusDays(CANCELLATION_AVAILABLE_DAYS).isBefore(now)) {
+            throw new BusinessException("결제 확정 후 7일이 지나 취소할 수 없습니다.");
+        }
+
         this.status = EnrollmentStatus.CANCELLED;
-        this.cancelledAt = LocalDateTime.now();
+        this.cancelledAt = now;
     }
 
     public boolean isConfirmed() {
