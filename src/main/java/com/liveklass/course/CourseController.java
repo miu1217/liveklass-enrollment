@@ -32,7 +32,7 @@ public class CourseController {
     public ResponseEntity<CourseResponse> createCourse(
             @RequestHeader("X-CREATOR-ID") String creatorId,
             @RequestHeader("X-USER-ROLE") String role,
-            @RequestBody CourseCreateRequest request)
+            @RequestBody @Valid CourseCreateRequest request)
     {
 
         CourseResponse response =  courseService.createCourse(creatorId, role, request);
@@ -58,7 +58,7 @@ public class CourseController {
     @Operation(summary = "강의 목록 조회 API")
     @GetMapping(value = "/api/courses")
     public ResponseEntity<Page<CourseResponse>> getCourses(
-            @RequestHeader(required = false) CourseStatus status,
+            @RequestParam(required = false) CourseStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
             ){

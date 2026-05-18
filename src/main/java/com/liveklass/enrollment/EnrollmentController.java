@@ -69,7 +69,7 @@ public class EnrollmentController {
      * 내 수강 신청 목록 조회
      * */
     @Operation(summary = "내 수강 신청 목록 조회 API")
-    @GetMapping("/api/enrollment/me")
+    @GetMapping("/api/enrollments/me")
     public ResponseEntity<Page<EnrollmentResponse>> getMyEnrollments(
             @RequestHeader("X-USER-ID") String studentId,
             @RequestParam(defaultValue = "0") int page,
